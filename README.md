@@ -13,7 +13,7 @@ A simple recipe to bring up a quick, self-contained Homer5 instance:
 
 Status: 
 
-* [![Build Status](https://travis-ci.org/QXIP/homer-docker.svg?branch=master)](https://travis-ci.org/QXIP/homer-docker)
+* [![Build Status](https://travis-ci.org/sipcapture/homer-docker.svg?branch=master)](https://travis-ci.org/sipcapture/homer-docker)
 
 * Initial working prototype - Testing Needed!
  
@@ -22,7 +22,7 @@ Status:
 ### Mult-container quick-start
 
 ```bash
-git clone https://github.com/QXIP/homer-docker.git
+git clone https://github.com/sipcapture/homer-docker.git
 cd homer-docker
 docker-compose pull
 docker-compose up
@@ -100,12 +100,12 @@ While the multi-container setup is recommended, you can find the legacy containe
 
 ### Pull latest
 ```
-docker pull qxip/homer-docker
+docker pull sipcapture/homer-docker
 ```
 
 ### Run latest
 ```
-docker run -tid --name homer5 -p 80:80 -p 9060:9060/udp qxip/homer-docker
+docker run -tid --name homer5 -p 80:80 -p 9060:9060/udp sipcapture/homer-docker
 ```
 
 ### Running with a local MySQL
@@ -115,7 +115,7 @@ By default, the container runs with a local instance of MySQL running. It may be
 You can run this container with a volume like so:
 
 ```
-docker run -it -v /tmp/homer_mysql/:/var/lib/mysql --name homer5 -p 80:80 -p 9060:9060/udp qxip/homer-docker
+docker run -it -v /tmp/homer_mysql/:/var/lib/mysql --name homer5 -p 80:80 -p 9060:9060/udp sipcapture/homer-docker
 ```
 
 ### Running with an external MySQL
@@ -123,7 +123,7 @@ docker run -it -v /tmp/homer_mysql/:/var/lib/mysql --name homer5 -p 80:80 -p 906
 If you'd like to run with an external MySQL, pass in the host information for the remote MySQL as entrypoint parameters at the end of your `docker run` command.
 
 ```
-docker run -tid --name homer5 -p 80:80 -p 9060:9060/udp qxip/homer-docker --dbhost 10.0.0.1 --dbuser homer_user -dbpass homer_password
+docker run -tid --name homer5 -p 80:80 -p 9060:9060/udp sipcapture/homer-docker --dbhost 10.0.0.1 --dbuser homer_user -dbpass homer_password
 ```
 
 ### Entrypoint Parameters
@@ -142,8 +142,8 @@ Homer5 Docker parameters:
 
 ### Local Build & Test
 ```
-git clone https://github.com/qxip/homer-docker; cd homer-docker
-docker build --tag="qxip/homer-docker:local" ./everything/
-docker run -t -i qxip/homer-docker:local --name homer5
+git clone https://github.com/sipcapture/homer-docker; cd homer-docker
+docker build --tag="sipcapture/homer-docker:local" ./everything/
+docker run -t -i sipcapture/homer-docker:local --name homer5
 docker exec -it homer5 bash
 ```
