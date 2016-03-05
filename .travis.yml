@@ -1,0 +1,56 @@
+sudo: required
+services:
+  - docker
+env:
+  DOCKER_COMPOSE_VERSION: 1.6.2
+
+before_install:
+  # Install a later docker
+  - sudo apt-get update -y
+  - sudo apt-get install -y apt-transport-https ca-certificates apparmor
+  - sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+  - sudo su -c "echo 'deb https://apt.dockerproject.org/repo ubuntu-trusty main' > /etc/apt/sources.list.d/docker.list"
+  - sudo apt-get update -y 
+  - sudo apt-cache policy docker-engine
+  - >
+    sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -y docker-engine
+  - sudo service docker stop || true
+  - sudo service docker start
+  # Setup docker-compose
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  # Setup HEPGEN.js.
+  - docker pull node:latest
+  - git clone https://github.com/sipcapture/hepgen.js.git
+  - docker run --name hepgen --workdir=/hepgen.js/ -v $(pwd)/hepgen.js:/hepgen.js --entrypoint=/bin/bash -td node -c 'while true; do sleep 60; done;'
+  - docker exec -it hepgen npm install
+  # Find docker bridge IP
+  - >
+    docker0ip=`ifconfig | grep -i -A1 docker0 | grep -i inet | awk '{print $2}' | sed -e "s/addr\://"`
+
+  # Setup Hep to send to the proper location (the docker bridge)
+  - docker exec -it hepgen sed -i -e "s/127.0.0.1/$docker0ip/" /hepgen.js/config/default.js
+
+script:
+  - docker build --tag="qxip/homer-docker:local" ./everything/
+  - docker-compose build
+  - docker-compose up -d
+  # Wait for containers to be bootstrapped.
+  - >
+    while [[ true ]]; do 
+      echo "waiting for containers to be bootstrapped with data structures..."; 
+      sleep 2; 
+      docker exec -it homer-webapp ls /homer-semaphore/.bootstrapped &> /dev/null; 
+      look_exit=$?; 
+      if [[ "$look_exit" = "0" ]]; then echo "found semaphore"; break; fi; 
+    done;
+
+  # Now you can run HEPGEN.js
+  - docker exec -it hepgen node hepgen.js
+  # Check that there's something in the database, we select the count of calls from HEPGEN.js, and verify there's 3 calls counted
+  - docker exec -it mysql mysql -u root -p'secret' -s -e "SELECT COUNT(*) FROM homer_data.sip_capture_call_$(date '+%Y%m%d')" | tail -n 1 | grep -Pi "^3"
+  # Check that there's a web connection on local host, returning a 200 OK
+  - > 
+    curl -s -o /dev/null -w "%{http_code}" localhost | grep -iP "^200$"
