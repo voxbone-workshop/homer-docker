@@ -56,6 +56,6 @@ script:
     curl -s -o /dev/null -w "%{http_code}" localhost | grep -iP "^200$"
 
   # Run the rotation cron, and make sure it exits without any output.
-  - docker exec -it homer-cron bash -c "/opt/homer_rotate"
-  - >
-    cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
+  # - docker exec -it homer-cron bash -c "/opt/homer_rotate"
+  # - >
+  #   cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
