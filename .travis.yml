@@ -47,11 +47,6 @@ script:
       if [[ "$look_exit" = "0" ]]; then echo "found semaphore"; break; fi; 
     done;
 
-  # Run the rotation cron, and make sure it exits without any output.
-  - >
-    cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
-  
-
   # Now you can run HEPGEN.js
   - docker exec -it hepgen node hepgen.js
   # Check that there's something in the database, we select the count of calls from HEPGEN.js, and verify there's 3 calls counted
@@ -59,3 +54,8 @@ script:
   # Check that there's a web connection on local host, returning a 200 OK
   - > 
     curl -s -o /dev/null -w "%{http_code}" localhost | grep -iP "^200$"
+
+  # Run the rotation cron, and make sure it exits without any output.
+  - docker exec -it homer-cron bash -c "/opt/homer_rotate"
+  - >
+    cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
