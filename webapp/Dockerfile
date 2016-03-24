@@ -30,14 +30,6 @@ COPY configuration.php /var/www/html/api/configuration.php
 COPY preferences.php /var/www/html/api/preferences.php
 COPY vhost.conf /etc/apache2/sites-enabled/000-default.conf
 
-# Install the cron service
-RUN touch /var/log/cron.log
-RUN apt-get update -qq && apt-get install cron -y && rm -rf /var/lib/apt/lists/*
-
-# Add our crontab file
-RUN echo "30 3 * * * /opt/homer_rotate >> /var/log/cron.log 2>&1" > /crons.conf
-RUN crontab /crons.conf
-
 COPY run.sh /run.sh
 RUN chmod a+rx /run.sh
 

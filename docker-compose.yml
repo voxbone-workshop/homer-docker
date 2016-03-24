@@ -16,6 +16,19 @@ services:
       - "mysql:mysql"
     env_file:
       - ./homer.env
+  # --------------------------------------------- cron container
+  cron:
+    container_name: homer-cron
+    build: ./cron/.
+    image: qxip/homer-cron
+    depends_on:
+      - mysql
+    volumes:
+      - homer-data-semaphore:/homer-semaphore/
+    links:
+      - "mysql:mysql"
+    env_file:
+      - ./homer.env
   # --------------------------------------------- Kamailio container
   kamailio:
     container_name: homer-kamailio
