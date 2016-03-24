@@ -48,7 +48,10 @@ script:
     done;
 
   # Run the rotation cron, and make sure it exits without any output.
-  - docker exec -it homer-cron /opt/homer_rotate | grep -iP "^$"
+  - >
+    cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
+  
+
   # Now you can run HEPGEN.js
   - docker exec -it hepgen node hepgen.js
   # Check that there's something in the database, we select the count of calls from HEPGEN.js, and verify there's 3 calls counted
