@@ -1,11 +1,11 @@
 build:
-	docker build --tag="qxip/homer-docker:latest" ./everything
+	docker build --tag="sipcapture/homer-docker:latest" ./everything
 
 run:
-	docker run -dt --name homer5 -p 80:80 -p 9060:9060/udp qxip/homer-docker:latest
+	docker run -dt --name homer5 -p 80:80 -p 9060:9060/udp sipcapture/homer-docker:latest
 
 run-container:
-	docker run -tid --name homer5 -p 80:80 -p 9060:9060/udp qxip/homer-docker
+	docker run -tid --name homer5 -p 80:80 -p 9060:9060/udp sipcapture/homer-docker
 
 test:
 	curl localhost
