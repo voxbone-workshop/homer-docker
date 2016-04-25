@@ -24,7 +24,7 @@ Status:
 ```bash
 git clone https://github.com/sipcapture/homer-docker.git
 cd homer-docker
-docker-compose pull
+docker-compose build
 docker-compose up
 ```
 
@@ -51,16 +51,6 @@ Which will spin up all the containers, and it will show you the logs (the STDOUT
 ```bash
 $ docker-compose up -d
 ```
-
-### Rebuilding
-
-If you need 
-
-```bash
-$ docker-compose build
-```
-
-Also see the man 
 
 ### Modifying the default options
 
