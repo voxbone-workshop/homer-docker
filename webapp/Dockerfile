@@ -6,7 +6,7 @@ MAINTAINER L. Mangani <lorenzo.mangani@gmail.com>
 ENV HOME /root
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV BUILD_DATE 2016-03-03
+ENV BUILD_DATE 2016-04-25
 
 # Update and upgrade apt
 RUN apt-get update -qq
@@ -20,6 +20,8 @@ RUN git clone --depth 1 https://github.com/sipcapture/homer-ui.git /homer-ui
 
 RUN chmod +x /homer-api/scripts/*
 RUN cp /homer-api/scripts/*.* /opt/
+RUN mkdir /opt/homer_rotate/
+RUN cp /homer-api/scripts/new/* /opt/homer_rotate/
 
 RUN cp -R /homer-ui/* /var/www/html/
 RUN cp -R /homer-api/api /var/www/html/
