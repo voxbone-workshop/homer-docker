@@ -15,6 +15,7 @@ RUN apt-get install --no-install-recommends --no-install-suggests -yqq ca-certif
 RUN a2enmod php5
 
 # HOMER 5
+ENV HOMER_VERSION_CACHE_BUSTER arbitrary_value_0x000000b33f
 RUN git clone --depth 1 https://github.com/sipcapture/homer-api.git /homer-api
 RUN git clone --depth 1 https://github.com/sipcapture/homer-ui.git /homer-ui
 

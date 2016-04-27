@@ -18,11 +18,11 @@ done
 
 # Reconfigure rotation
 
-export PATH_ROTATION_SCRIPT=/opt/homer_rotate/homer_rotate
+export PATH_ROTATION_SCRIPT=/opt/new/homer_rotate
 chmod 775 $PATH_ROTATION_SCRIPT
 chmod +x $PATH_ROTATION_SCRIPT
 
-export PATH_ROTATION_CONFIG=/opt/homer_rotate/rotation.ini
+export PATH_ROTATION_CONFIG=/opt/new/rotation.ini
 
 perl -p -i -e "s/homer_user/$DB_USER/" $PATH_ROTATION_CONFIG
 perl -p -i -e "s/homer_password/$DB_PASS/" $PATH_ROTATION_CONFIG
@@ -37,7 +37,7 @@ do
 done
 
 # Init rotation
-/opt/homer_rotate/homer_rotate
+/opt/new/homer_rotate
 
 # Start the cron service in the foreground, which will run rotation
 cron -f
