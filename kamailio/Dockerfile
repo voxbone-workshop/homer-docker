@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -qq
 
 # Kamailio + sipcapture module
-RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xfb40d3e6508ea4c8
+RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xfb40d3e6508ea4c8
 RUN echo "deb http://deb.kamailio.org/kamailio jessie main" >> etc/apt/sources.list
 RUN echo "deb-src http://deb.kamailio.org/kamailio jessie main" >> etc/apt/sources.list
 RUN apt-get update -qq && apt-get install -f -yqq kamailio rsyslog kamailio-outbound-modules kamailio-geoip-modules kamailio-sctp-modules kamailio-tls-modules kamailio-websocket-modules kamailio-utils-modules kamailio-mysql-modules kamailio-extra-modules && rm -rf /var/lib/apt/lists/*
