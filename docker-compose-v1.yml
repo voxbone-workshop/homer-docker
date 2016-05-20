@@ -1,0 +1,73 @@
+# --------------------------------------------- MySQL container.
+mysql:
+  container_name: mysql
+  image: mysql:5.6
+  volumes:
+    - ./mysql/run.sh:/run.sh
+    - /var/data-homer/homer-semaphore/:/homer-semaphore/
+    - /etc/localtime:/etc/localtime
+    - /var/data-homer/db/:/var/lib/mysql
+  entrypoint:
+    - /run.sh
+  env_file:
+    - ./homer.env
+# --------------------------------------------- Web app container
+webapp:
+  container_name: homer-webapp
+  build: ./webapp/.
+  ports:
+    - "80:80"
+  volumes:
+    - /homer-api/
+    - /var/data-homer/homer-semaphore/:/homer-semaphore/
+  links:
+    - "mysql:mysql"
+  env_file:
+    - ./homer.env
+# --------------------------------------------- cron container
+cron:
+  container_name: homer-cron
+  build: ./cron/.
+  volumes:
+    - /var/data-homer/homer-semaphore/:/homer-semaphore/
+  links:
+    - "mysql:mysql"
+  env_file:
+    - ./homer.env
+# --------------------------------------------- Kamailio container
+kamailio:
+  container_name: homer-kamailio
+  build: ./kamailio/.
+  ports:
+    - "9060:9060/udp"
+  links:
+    - "mysql:mysql"
+  volumes:
+    - /var/data-homer/homer-semaphore/:/homer-semaphore/
+  # entrypoint:
+  #   - /bin/bash
+  # command:
+  #   >
+  #   -c 'while true; do sleep 60; done;'
+  env_file:
+    - ./homer.env      
+# --------------------------------------------- Data bootstrapping container
+bootstrap:
+  container_name: bootstrap-mysql
+  image: mysql:5.6
+  links:
+    - "mysql:mysql"
+  volumes_from:
+    - webapp
+  volumes:
+    - /var/data-homer/homer-semaphore/:/homer-semaphore/
+    - ./bootstrap-data/bootstrap.sh:/bootstrap.sh
+  # entrypoint:
+  #   - /bin/bash
+  # command:
+  #   >
+  #   -c 'while true; do sleep 60; done;'
+  entrypoint:
+    - /bootstrap.sh
+  env_file:
+    - ./homer.env      
