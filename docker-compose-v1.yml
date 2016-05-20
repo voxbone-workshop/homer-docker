@@ -1,3 +1,29 @@
+# -------------------------------------------------------
+# -- The backwards compatiable docker-compose definition
+# -- ...in case you don't have docker version 1.10 or later.
+#
+# # -- Make a spot for it
+# sudo mkdir -p /opt/bin
+# # -- Download it
+# sudo bash -c 'curl -L https://github.com/docker/compose/releases/download/1.6.2/run.sh > /opt/bin/docker-compose'
+# # -- make it executable
+# sudo chmod +x /opt/bin/docker-compose
+# # -- this will pull it.
+# docker-compose -v
+#
+# # -- clone it
+# git clone https://github.com/sipcapture/homer-docker.git
+# cd homer-docker
+
+# # -- build it!
+# docker-compose --file docker-compose-v1.yml build
+# # -- That will fail, it's OK, have to do a manual step
+# docker tag homerdocker_webapp qxip/homer-webapp
+# # -- Build again
+# docker-compose --file docker-compose-v1.yml build
+# # -- Pull what's left.
+# docker-compose --file docker-compose-v1.yml build
+
 # --------------------------------------------- MySQL container.
 mysql:
   container_name: mysql
