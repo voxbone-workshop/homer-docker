@@ -79,7 +79,6 @@ services:
     volumes:
       - ./mysql/run.sh:/run.sh
       - homer-data-semaphore:/homer-semaphore/
-      - /etc/localtime:/etc/localtime
       - homer-data-mysql:/var/lib/mysql
     entrypoint:
       - /run.sh

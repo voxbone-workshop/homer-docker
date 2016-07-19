@@ -68,9 +68,6 @@ if [[ ! "$databases" =~ "homer_data" ]]; then
   # echo "Creating local DB Node..."
   mysql --host "$DB_HOST" -u "$DB_USER" homer_configuration -e "REPLACE INTO node VALUES(1,'mysql','homer_data','3306','"$DB_USER"','"$DB_PASS"','sip_capture','node1', 1);"
 
-  # set mysql timezone to UTC.
-  mysql --host "$DB_HOST" -u "$DB_USER" -e "SET @@global.time_zone='+00:00'"
-
   echo "Homer initial data load complete" > $DATADIR/.homer_initialized
 else
   echo "Detected Homer databases are already installed."
