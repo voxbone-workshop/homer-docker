@@ -10,15 +10,22 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -qq
 
 # OpenSIPS + sipcapture module
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5F2FBB7C
-echo "deb http://apt.opensips.org jessie 2.2-nightly" >>/etc/apt/sources.list
-RUN apt-get update -qq && apt-get install -f -yqq opensips* rsyslog 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 049AD65B
+RUN echo "deb http://apt.opensips.org jessie 2.2-releases" >>/etc/apt/sources.list
+RUN apt-get update -qq && apt-get install -f -yqq rsyslog opensips opensips-geoip-module opensips-json-module opensips-mysql-module opensips-regex-module opensips-restclient-module  && rm -rf /var/lib/apt/lists/*
 
-COPY opensips.cfg /usr/local/opensips/etc/opensips/opensips.cfg
-RUN chmod 775 /usr/local/opensips/etc/opensips/opensips.cfg
+RUN mkdir /etc/opensips
+COPY opensips.cfg /etc/opensips/opensips.cfg
+RUN chmod 775 /etc/opensips/opensips.cfg
+
+RUN ln -s /usr/lib64 /usr/lib/x86_64-linux-gnu/
 
 # GeoIP (http://dev.maxmind.com/geoip/legacy/geolite/)
+RUN apt-get update -qq && apt-get install -f -yqq geoip-database geoip-database-extra
 # RUN cd /usr/share/GeoIP && curl http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz > GeoLiteCity.dat.gz && gunzip GeoLiteCity.dat.gz
+
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
 COPY run.sh /run.sh
 
