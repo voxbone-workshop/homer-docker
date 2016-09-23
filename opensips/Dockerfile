@@ -11,7 +11,7 @@ RUN apt-get update -qq && apt-key adv --keyserver keyserver.ubuntu.com --recv-ke
 && echo "deb http://apt.opensips.org jessie 2.2-releases" >>/etc/apt/sources.list \
 && apt-get update -qq && apt-get install -f -yqq rsyslog opensips opensips-geoip-module opensips-json-module opensips-mysql-module opensips-regex-module opensips-restclient-module geoip-database geoip-database-extra && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /etc/opensips
+RUN mkdir -p /etc/opensips
 COPY opensips.cfg /etc/opensips/opensips.cfg
 RUN chmod 775 /etc/opensips/opensips.cfg
 
