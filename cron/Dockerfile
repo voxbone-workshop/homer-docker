@@ -1,6 +1,6 @@
-FROM qxip/homer-webapp
+FROM sipcapture/homer-docker:webapp
 MAINTAINER L. Mangani <lorenzo.mangani@gmail.com>
-ENV BUILD_DATE 2016-03-23
+ENV BUILD_DATE 2016-09-23
 
 # Install the cron service
 RUN touch /var/log/cron.log
