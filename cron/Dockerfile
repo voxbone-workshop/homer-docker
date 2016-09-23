@@ -1,4 +1,4 @@
-FROM sipcapture/homer-docker:webapp
+FROM sipcapture/homer-webapp
 MAINTAINER L. Mangani <lorenzo.mangani@gmail.com>
 ENV BUILD_DATE 2016-09-23
 
