@@ -39,8 +39,5 @@ done
 # Init rotation
 /opt/new/homer_rotate
 
-# Ensure cron is allowed to run
-sed -i 's/^\(session\s\+required\s\+pam_loginuid\.so.*$\)/# \1/g' /etc/pam.d/cron
-
 # Start the cron service in the foreground, which will run rotation
 cron -f
