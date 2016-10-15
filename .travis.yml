@@ -62,7 +62,8 @@ script:
     curl -s -o /dev/null -w "%{http_code}" localhost | grep -iP "^200$"
 
   # Let's try to test cron, let's set the system time.
-  - date --set="$(date -d '+4 days' +'%d %b %Y 03:29:50')"
+  - sudo date --set="$(date -d '+4 days' +'%d %b %Y 03:29:50')"
+  - date
 
   # Then wait 45 seconds (there's more efficient ways of doing this, but, sometimes cron takes a while to pick up on this, 35-ish seconds in a local test.
   - sleep 45
