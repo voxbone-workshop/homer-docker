@@ -69,8 +69,12 @@ script:
   - sleep 45
 
   # Now let's look at the results 
-  - all_tables=$(docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data")
-  - echo $all_tables
+  # Show them all (for debugging purposes)
+  - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data"
+  # Create a grep pattern.
+  - target_pattern=sip_capture_call_$(date +'%Y%m%d')
+  # Now see that today's table is there, which would indicate that the cron job ran.
+  - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep $target_pattern
 
   # More to come do something with the results of that test
 
