@@ -69,6 +69,7 @@ script:
 
   # Now let's look at the results 
   - all_tables=$(docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data")
+  - echo $all_tables
 
   # More to come do something with the results of that test
 
