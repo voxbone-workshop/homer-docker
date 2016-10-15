@@ -75,6 +75,9 @@ script:
   - target_pattern=sip_capture_call_$(date +'%Y%m%d')
   # Now see that today's table is there, which would indicate that the cron job ran.
   - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep $target_pattern
+  # And look at the cron logs and the docker logs
+  - docker logs homer-cron
+  - docker exec -it homer-cron cat /var/log/cron
 
   # More to come do something with the results of that test
 
