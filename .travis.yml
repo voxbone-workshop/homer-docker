@@ -77,11 +77,3 @@ script:
   - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep $target_pattern
   # And look at the cron logs and the docker logs
   - docker logs homer-cron
-  - docker exec -it homer-cron cat /var/log/cron
-
-  # More to come do something with the results of that test
-
-  # Run the rotation cron, and make sure it exits without any output.
-  # - docker exec -it homer-cron bash -c "/opt/homer_rotate"
-  # - >
-  #   cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
