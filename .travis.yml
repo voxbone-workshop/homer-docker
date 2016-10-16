@@ -85,7 +85,7 @@ script:
       echo "waiting for cron to run... [$tries]"; 
       sleep 2; 
       # Now see that today's table is there, which would indicate that the cron job ran.
-      - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep sip_capture_call_$(date +'%Y%m%d')
+      docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep sip_capture_call_$(date +'%Y%m%d')
       look_exit=$?; 
       if [[ "$look_exit" = "0" ]]; then echo "found table created by cron"; break; fi; 
       if [[ "$tries" -ge "$max_tries" ]]; then echo "no table created by cron in time"; exit 1; break; fi;
