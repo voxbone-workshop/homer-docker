@@ -7,6 +7,7 @@ env:
 before_install:
   # Install a later docker
   - sudo apt-get update -y
+  - sudo timedatectl set-timezone UTC
   - sudo apt-get install -y apt-transport-https ca-certificates apparmor libfaketime
   - sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
   - sudo su -c "echo 'deb https://apt.dockerproject.org/repo ubuntu-trusty main' > /etc/apt/sources.list.d/docker.list"
@@ -38,12 +39,16 @@ script:
   - docker-compose up -d
   # Wait for containers to be bootstrapped.
   - >
+    export tries=0; 
+    export max_tries=60;
     while [[ true ]]; do 
-      echo "waiting for containers to be bootstrapped with data structures..."; 
+      tries=$((tries + 1));
+      echo "waiting for containers to be bootstrapped with data structures... [$tries]"; 
       sleep 2; 
       docker exec -it homer-webapp ls /homer-semaphore/.bootstrapped &> /dev/null; 
       look_exit=$?; 
       if [[ "$look_exit" = "0" ]]; then echo "found semaphore"; break; fi; 
+      if [[ "$tries" -ge "$max_tries" ]]; then echo "no semaphore found in time"; exit 1; break; fi;
     done;
 
   # Now you can run HEPGEN.js
@@ -63,25 +68,30 @@ script:
 
   # Let's try to test cron, let's set the system time.
   - sudo date --set="$(date -d '+4 days' +'%d %b %Y 03:29:50')"
+  # Show host date...
   - date
+  # Show cron's date inside the container...
+  - docker exec -it homer-cron date
 
-  # Then wait 45 seconds (there's more efficient ways of doing this, but, sometimes cron takes a while to pick up on this, 35-ish seconds in a local test.
-  - sleep 45
-
-  # Now let's look at the results 
-  # Show them all (for debugging purposes)
-  - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data"
   # Create a grep pattern.
   - target_pattern=sip_capture_call_$(date +'%Y%m%d')
-  # Now see that today's table is there, which would indicate that the cron job ran.
-  - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep $target_pattern
+
+  # Wait up to two minutes looking for the tables.
+  - >
+    export tries=0; 
+    export max_tries=60;
+    while [[ true ]]; do 
+      tries=$((tries + 1));
+      echo "waiting for cron to run... [$tries]"; 
+      sleep 2; 
+      # Now see that today's table is there, which would indicate that the cron job ran.
+      docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data" | grep sip_capture_call_$(date +'%Y%m%d')
+      look_exit=$?; 
+      if [[ "$look_exit" = "0" ]]; then echo "found table created by cron"; break; fi; 
+      if [[ "$tries" -ge "$max_tries" ]]; then echo "no table created by cron in time"; exit 1; break; fi;
+    done;
+
+  # Show all the tables (for debugging purposes)
+  - docker exec -it mysql mysql -u root -p'secret' -s -e "show tables from homer_data"
   # And look at the cron logs and the docker logs
   - docker logs homer-cron
-  - docker exec -it homer-cron cat /var/log/cron
-
-  # More to come do something with the results of that test
-
-  # Run the rotation cron, and make sure it exits without any output.
-  # - docker exec -it homer-cron bash -c "/opt/homer_rotate"
-  # - >
-  #   cron_result=$(docker exec -it homer-cron bash -c "/opt/homer_rotate") && echo $cron_result | grep -i "^$"
