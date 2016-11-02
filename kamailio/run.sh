@@ -8,6 +8,7 @@
 # DB_PASS             MySQL password (homer_password)
 # DB_USER             MySQL user (homer_user)
 # DB_HOST             MySQL host (127.0.0.1 [docker0 bridge])
+# DB_PORT             MySQL port (3306)
 # KAMAILIO_HEP_PORT   Kamailio HEP Socket port (9060)
 # ----------------------------------------------------
 
@@ -30,6 +31,7 @@ mv $PATH_KAMAILIO_CFG.tmp $PATH_KAMAILIO_CFG
 perl -p -i -e "s/\{\{ KAMAILIO_HEP_PORT \}\}/$KAMAILIO_HEP_PORT/" $PATH_KAMAILIO_CFG
 perl -p -i -e "s/\{\{ DB_PASS \}\}/$DB_PASS/" $PATH_KAMAILIO_CFG
 perl -p -i -e "s/\{\{ DB_HOST \}\}/$DB_HOST/" $PATH_KAMAILIO_CFG
+perl -p -i -e "s/\{\{ DB_PORT \}\}/$DB_PORT/" $PATH_KAMAILIO_CFG
 perl -p -i -e "s/\{\{ DB_USER \}\}/$DB_USER/" $PATH_KAMAILIO_CFG
 
 # Change kamailio datestamp for sql tables
