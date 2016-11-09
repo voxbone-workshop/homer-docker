@@ -137,3 +137,24 @@ docker build --tag="sipcapture/homer-docker:local" ./everything/
 docker run -t -i sipcapture/homer-docker:local --name homer5
 docker exec -it homer5 bash
 ```
+
+### Appendix - Destination Stats
+
+By defining `WITH_HOMER_DEST_STATS` in kamailio.cfg it's possible to enable capturing data related to the dialled country, prefix, geolocation and duration.
+
+The data is transported inside a SIP header, `P-Dest-Stats`.
+
+Example:
+
+```
+P-Dest-Stats: CC=es;PR=+349;Dur=138;Lat=0;Lon=0
+```
+
+Kamailio will do two things:
+
+1. Populate the table `homer_statistic.stats_dest_mem` as soon as that header is found in a SIP message
+
+2. Every 5 minutes summarise the stats into `homer_statistic.stats_dest_reply` and empty `homer_statistic.stats_dest_mem`
+
+The data from `homer_statistic.stats_dest_reply` can be presented inside a `Sipcapture Stats` widget.
+
