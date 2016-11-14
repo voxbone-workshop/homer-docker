@@ -12,6 +12,7 @@ services:
     volumes:
       - /homer-api/
       - homer-data-semaphore:/homer-semaphore/
+      - homer-data-dashboard:/var/www/html/store/dashboard/
     links:
       - "mysql:mysql"
     env_file:
@@ -87,3 +88,4 @@ services:
 volumes:
   homer-data-semaphore:
   homer-data-mysql:
+  homer-data-dashboard:
