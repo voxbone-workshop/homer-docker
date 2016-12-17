@@ -4,7 +4,7 @@ services:
   webapp:
     container_name: homer-webapp
     build: ./webapp/.
-    image: qxip/homer-webapp
+    image: sipcapture/homer-webapp
     ports:
       - "80:80"
     depends_on:
@@ -20,7 +20,7 @@ services:
   cron:
     container_name: homer-cron
     build: ./cron/.
-    image: qxip/homer-cron
+    image: sipcapture/homer-cron
     depends_on:
       - mysql
     volumes:
@@ -33,7 +33,7 @@ services:
   kamailio:
     container_name: homer-kamailio
     build: ./kamailio/.
-    image: qxip/homer-kamailio
+    image: sipcapture/homer-kamailio
     ports:
       - "9060:9060/udp"
     depends_on:
