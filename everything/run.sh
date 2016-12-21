@@ -195,5 +195,6 @@ a2enmod rewrite
 apachectl start
 
 # It's Homer time!
-$kamailio -f $PATH_KAMAILIO_CFG -DD -E -e
+$kamailio -f $PATH_KAMAILIO_CFG -DD -E -e 2>&1 >> /var/log/syslog &
+tail -f /var/log/syslog
 
