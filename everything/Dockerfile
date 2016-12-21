@@ -81,6 +81,8 @@ RUN crontab /crons.conf
 COPY run.sh /run.sh
 RUN chmod a+rx /run.sh
 
+RUN wget -O /dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.1.3/dumb-init_1.1.3_amd64 && chmod +x /dumb-init
+
 # Add persistent MySQL volumes
 VOLUME ["/etc/mysql", "/var/lib/mysql", "/var/www/html/store"]
 
@@ -91,4 +93,5 @@ EXPOSE 9060
 # MySQL
 #EXPOSE 3306
 
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["/dumb-init", "--"]
+CMD ["/run.sh"]
