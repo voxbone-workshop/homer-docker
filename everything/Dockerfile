@@ -56,10 +56,16 @@ COPY data/preferences.php /var/www/html/api/preferences.php
 COPY data/vhost.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Kamailio + sipcapture module
-RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xfb40d3e6508ea4c8
-RUN echo "deb http://deb.kamailio.org/kamailiodev-nightly jessie main" >> etc/apt/sources.list
-RUN echo "deb-src http://deb.kamailio.org/kamailiodev-nightly jessie main" >> etc/apt/sources.list
-RUN apt-get update -qq && apt-get install -f -yqq kamailio rsyslog kamailio-outbound-modules kamailio-geoip-modules kamailio-sctp-modules kamailio-tls-modules kamailio-websocket-modules kamailio-utils-modules kamailio-mysql-modules kamailio-extra-modules && rm -rf /var/lib/apt/lists/*
+#RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xfb40d3e6508ea4c8
+#RUN echo "deb http://deb.kamailio.org/kamailiodev-nightly jessie main" >> etc/apt/sources.list
+#RUN echo "deb-src http://deb.kamailio.org/kamailiodev-nightly jessie main" >> etc/apt/sources.list
+#RUN apt-get update -qq && apt-get install -f -yqq kamailio rsyslog kamailio-outbound-modules kamailio-geoip-modules kamailio-sctp-modules kamailio-tls-modules kamailio-websocket-modules kamailio-utils-modules kamailio-mysql-modules kamailio-extra-modules && rm -rf /var/lib/apt/lists/*
+
+# Compile Kamailio 4.4 + modules
+RUN apt-get update -qq && apt-get install -yqq vim-nox cron git ngrep curl gcc automake build-essential flex bison libcurl4-openssl-dev libjansson-dev libev-dev libncurses5-dev unixodbc-dev xsltproc libssl-dev libmysqlclient-dev make libssl-dev libxml2-dev libpcre3-dev uuid-dev libicu-dev libunistring-dev libsnmp-dev libevent-dev autoconf libtool wget libconfuse-dev libgeoip-dev libgeoip1 && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth 1 --no-single-branch git://git.kamailio.org/kamailio -b 4.4 /usr/src/kamailio \
+&& cd /usr/src/kamailio && sed -Ei 's/^#define REPLACE_BUFFER_SIZE 1024/#define REPLACE_BUFFER_SIZE 4096/' re.c && make include_modules="db_mysql sipcapture pv textops rtimer xlog sqlops htable sl jansson siputils http_async_client htable rtimer xhttp avpops" cfg && make all && make install 
+
 
 COPY data/kamailio.cfg /etc/kamailio/kamailio.cfg
 RUN chmod 775 /etc/kamailio/kamailio.cfg
