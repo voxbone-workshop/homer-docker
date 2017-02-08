@@ -16,6 +16,7 @@ services:
       - "mysql:mysql"
     env_file:
       - ./homer.env
+    restart: always
   # --------------------------------------------- cron container
   cron:
     container_name: homer-cron
@@ -29,6 +30,7 @@ services:
       - "mysql:mysql"
     env_file:
       - ./homer.env
+    restart: always
   # --------------------------------------------- Kamailio container
   kamailio:
     container_name: homer-kamailio
@@ -48,7 +50,8 @@ services:
     #   >
     #   -c 'while true; do sleep 60; done;'
     env_file:
-      - ./homer.env      
+      - ./homer.env
+    restart: always
   # --------------------------------------------- Data bootstrapping container
   bootstrap:
     container_name: bootstrap-mysql
@@ -71,7 +74,8 @@ services:
     entrypoint:
       - /bootstrap.sh
     env_file:
-      - ./homer.env      
+      - ./homer.env
+    restart: always
   # --------------------------------------------- MySQL container.
   mysql:
     container_name: mysql
@@ -84,6 +88,7 @@ services:
       - /run.sh
     env_file:
       - ./homer.env
+    restart: always
 volumes:
   homer-data-semaphore:
   homer-data-mysql:
