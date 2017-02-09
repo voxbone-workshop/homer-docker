@@ -75,7 +75,6 @@ services:
       - /bootstrap.sh
     env_file:
       - ./homer.env
-    restart: always
   # --------------------------------------------- MySQL container.
   mysql:
     container_name: mysql
