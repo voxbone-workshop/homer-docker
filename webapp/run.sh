@@ -36,7 +36,10 @@ chmod -R 0775 /var/www/html/store/dashboard*
 
 #enable apache mod_php and mod_rewrite
 a2enmod php5
-a2enmod rewrite 
+a2enmod rewrite
+
+# Apache gets grumpy about PID files pre-existing
+rm -f /var/run/apache2/apache2.pid
 
 # Start Apache
 apachectl -DFOREGROUND
