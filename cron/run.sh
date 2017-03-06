@@ -18,11 +18,11 @@ done
 
 # Reconfigure rotation
 
-export PATH_ROTATION_SCRIPT=/opt/new/homer_rotate
+export PATH_ROTATION_SCRIPT=/opt/homer_rotate
 chmod 775 $PATH_ROTATION_SCRIPT
 chmod +x $PATH_ROTATION_SCRIPT
 
-export PATH_ROTATION_CONFIG=/opt/new/rotation.ini
+export PATH_ROTATION_CONFIG=/opt/rotation.ini
 
 perl -p -i -e "s/homer_user/$DB_USER/" $PATH_ROTATION_CONFIG
 perl -p -i -e "s/homer_password/$DB_PASS/" $PATH_ROTATION_CONFIG
