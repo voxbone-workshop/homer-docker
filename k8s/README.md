@@ -2,15 +2,32 @@
 
 Running Homer in Kubernetes.
 
+## Running it (Currently WIP!)
+
+Clone it (Currently based on k8s branch for Doug's PoC.)
+
+```
+git clone -b k8s https://github.com/dougbtv/homer-docker.git
+cd homer-docker/k8s/
+```
+
+And then create from the given specs.
+
+```
+[centos@kube-master k8s]$ kubectl create -f persistent.yaml 
+[centos@kube-master k8s]$ kubectl create -f deploy.yaml 
+[centos@kube-master k8s]$ kubectl create -f service.yaml 
+```
+
 ## Converting yaml with Kompose.
 
-Installation in Fedora (also available in CentOS EPEL)
+Installation in Fedora (also available in CentOS EPEL). Failed for Doug on first try. (kompose go app crashed)
 
 ```
 sudo dnf -y install kompose
 ```
 
-Or from source with
+Or from source with:
 
 ```
 sudo dnf install -y golang
