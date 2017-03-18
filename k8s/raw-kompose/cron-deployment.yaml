@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: cron
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: cron
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: '"Etc/UTC"'
+        - name: DB_USER
+          value: homer_user
+        - name: DB_PASS
+          value: homer_password
+        - name: USE_REMOTE_MYSQL
+          value: "false"
+        - name: DB_HOST
+          value: mysql
+        - name: DB_PORT
+          value: "3306"
+        - name: MYSQL_ROOT_PASSWORD
+          value: secret
+        - name: KAMAILIO_HEP_PORT
+          value: "9060"
+        image: sipcapture/homer-cron
+        name: homer-cron
+        resources: {}
+        volumeMounts:
+        - mountPath: /homer-semaphore/
+          name: homer-data-semaphore
+      restartPolicy: Always
+      volumes:
+      - name: homer-data-semaphore
+        persistentVolumeClaim:
+          claimName: homer-data-semaphore
+status: {}
