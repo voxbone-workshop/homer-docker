@@ -33,31 +33,16 @@ spec:
           value: secret
         - name: KAMAILIO_HEP_PORT
           value: "9060"
-        image: mysql:5.6
+        image: dougbtv/homer-bootstrap-data
         name: bootstrap-mysql
         resources: {}
         volumeMounts:
-        - mountPath: /homer-semaphore/
-          name: homer-data-semaphore
-        - mountPath: /bootstrap.sh
-          name: bootstrap-claim0
-        - mountPath: /homer-api/
-          name: webapp-claim0
         - mountPath: /homer-semaphore/
           name: homer-data-semaphore
         - mountPath: /var/www/html/store/dashboard/
           name: homer-data-dashboard
       restartPolicy: Always
       volumes:
-      - name: homer-data-semaphore
-        persistentVolumeClaim:
-          claimName: homer-data-semaphore
-      - name: bootstrap-claim0
-        persistentVolumeClaim:
-          claimName: bootstrap-claim0
-      - name: webapp-claim0
-        persistentVolumeClaim:
-          claimName: webapp-claim0
       - name: homer-data-semaphore
         persistentVolumeClaim:
           claimName: homer-data-semaphore
@@ -99,7 +84,7 @@ spec:
           value: secret
         - name: KAMAILIO_HEP_PORT
           value: "9060"
-        image: sipcapture/homer-cron
+        image: dougbtv/homer-cron
         name: homer-cron
         resources: {}
         volumeMounts:
@@ -145,7 +130,7 @@ spec:
           value: secret
         - name: KAMAILIO_HEP_PORT
           value: "9060"
-        image: sipcapture/homer-kamailio
+        image: dougbtv/homer-kamailio
         name: homer-kamailio
         ports:
         - containerPort: 9060
@@ -178,7 +163,9 @@ spec:
     spec:
       containers:
       - command:
-        - /run.sh
+          - /entrypoint.sh 
+        args:
+          - mysqld
         env:
         - name: TZ
           value: '"Etc/UTC"'
@@ -200,17 +187,12 @@ spec:
         name: mysql
         resources: {}
         volumeMounts:
-        - mountPath: /run.sh
-          name: mysql-claim0
         - mountPath: /homer-semaphore/
           name: homer-data-semaphore
         - mountPath: /var/lib/mysql
           name: homer-data-mysql
       restartPolicy: Always
       volumes:
-      - name: mysql-claim0
-        persistentVolumeClaim:
-          claimName: mysql-claim0
       - name: homer-data-semaphore
         persistentVolumeClaim:
           claimName: homer-data-semaphore
@@ -252,23 +234,18 @@ spec:
           value: secret
         - name: KAMAILIO_HEP_PORT
           value: "9060"
-        image: sipcapture/homer-webapp
+        image: dougbtv/homer-webapp
         name: homer-webapp
         ports:
         - containerPort: 80
         resources: {}
         volumeMounts:
-        - mountPath: /homer-api/
-          name: webapp-claim0
         - mountPath: /homer-semaphore/
           name: homer-data-semaphore
         - mountPath: /var/www/html/store/dashboard/
           name: homer-data-dashboard
       restartPolicy: Always
       volumes:
-      - name: webapp-claim0
-        persistentVolumeClaim:
-          claimName: webapp-claim0
       - name: homer-data-semaphore
         persistentVolumeClaim:
           claimName: homer-data-semaphore
