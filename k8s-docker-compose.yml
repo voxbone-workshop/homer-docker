@@ -21,8 +21,8 @@ services:
   # --------------------------------------------- cron container
   cron:
     container_name: homer-cron
-    build: ./cron/.
-    image: dougbtv/homer-cron
+    build: ./cron-k8s/.
+    image: dougbtv/homer-k8s-cron
     depends_on:
       - mysql
     volumes:
