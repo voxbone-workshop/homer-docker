@@ -229,3 +229,15 @@ homer-data-semaphore   Bound     gluster-volume-5   100Mi      RWX              
 /home/centos/homer-docker/k8s
 ```
 
+## And can you deploy?
+
+Created services, created deployment... and...
+
+looking freakin' close. We have the data bootstrapped and all pods actually run with a success (!?). But...
+
+There's a few things that need another eye.
+
+1. bootstrap pod is crash looping because it's a one-shot.
+2. we might wanna try health / readiness checks.
+
+

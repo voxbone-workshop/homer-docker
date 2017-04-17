@@ -36,7 +36,6 @@ export GOPATH=/usr/src/gocode
 go get -u github.com/kubernetes-incubator/kompose
 ```
 
-
 And run the convert...
 
 ```
