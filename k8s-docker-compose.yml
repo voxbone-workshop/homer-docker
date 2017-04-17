@@ -1,0 +1,94 @@
+version: '2'
+services:
+  # --------------------------------------------- Web app container
+  webapp:
+    container_name: homer-webapp
+    build: ./webapp/.
+    image: dougbtv/homer-webapp
+    ports:
+      - "80:80"
+    depends_on:
+      - mysql
+    volumes:
+      - /homer-api/
+      - homer-data-semaphore:/homer-semaphore/
+      - homer-data-dashboard:/var/www/html/store/dashboard/
+    links:
+      - "mysql:mysql"
+    env_file:
+      - ./homer.env
+    restart: always
+  # --------------------------------------------- cron container
+  cron:
+    container_name: homer-cron
+    build: ./cron/.
+    image: dougbtv/homer-cron
+    depends_on:
+      - mysql
+    volumes:
+      - homer-data-semaphore:/homer-semaphore/
+    links:
+      - "mysql:mysql"
+    env_file:
+      - ./homer.env
+    restart: always
+  # --------------------------------------------- Kamailio container
+  kamailio:
+    container_name: homer-kamailio
+    build: ./kamailio/.
+    image: dougbtv/homer-kamailio
+    ports:
+      - "9060:9060/udp"
+    depends_on:
+      - mysql
+    links:
+      - "mysql:mysql"
+    volumes:
+      - homer-data-semaphore:/homer-semaphore/
+    # entrypoint:
+    #   - /bin/bash
+    # command:
+    #   >
+    #   -c 'while true; do sleep 60; done;'
+    env_file:
+      - ./homer.env
+    restart: always
+  # --------------------------------------------- Data bootstrapping container
+  # debug with:
+  # docker run -it --volumes-from homer-webapp --network homerdocker_default --link mysql:mysql mysql:5.6 /bin/bash
+  bootstrap:
+    container_name: bootstrap-mysql
+    build: ./bootstrap-data/.
+    image: dougbtv/homer-bootstrap-data
+    depends_on:
+      - mysql
+    links:
+      - "mysql:mysql"
+    volumes:
+      - homer-data-semaphore:/homer-semaphore/
+    # entrypoint:
+    #   - /bin/bash
+    # command:
+    #   >
+    #   -c 'while true; do sleep 60; done;'
+    entrypoint:
+      - /bootstrap.sh
+    env_file:
+      - ./homer.env
+  # --------------------------------------------- MySQL container.
+  mysql:
+    container_name: mysql
+    image: mysql:5.6
+    volumes:
+      - ./mysql/run.sh:/run.sh
+      - homer-data-semaphore:/homer-semaphore/
+      - homer-data-mysql:/var/lib/mysql
+    entrypoint:
+      - /run.sh
+    env_file:
+      - ./homer.env
+    restart: always
+volumes:
+  homer-data-semaphore:
+  homer-data-mysql:
+  homer-data-dashboard:
