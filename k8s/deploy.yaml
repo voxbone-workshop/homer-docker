@@ -47,6 +47,56 @@ spec:
           claimName: homer-data-dashboard
 status: {}
 ---
+# -----------------------------------------------
+# -- Alpha feature!
+# -----------------------------------------------
+# k8s cron docs: http://tinyurl.com/kube-cron
+# Have to enable it in the api etc. So...
+# For now, going old school style.
+# -----------------------------------------------
+# apiVersion: batch/v2alpha1
+# kind: CronJob
+# metadata:
+#   name: homer-cron
+# spec:
+#   schedule: "30 3 * * *"
+#   jobTemplate:
+#     spec:
+#       template:
+#         spec:
+#           containers:
+#             - name: homer-cron
+#               env:
+#                 - name: TZ
+#                   value: '"Etc/UTC"'
+#                 - name: DB_USER
+#                   value: homer_user
+#                 - name: DB_PASS
+#                   value: homer_password
+#                 - name: USE_REMOTE_MYSQL
+#                   value: "false"
+#                 - name: DB_HOST
+#                   value: mysql
+#                 - name: DB_PORT
+#                   value: "3306"
+#                 - name: MYSQL_ROOT_PASSWORD
+#                   value: secret
+#                 - name: KAMAILIO_HEP_PORT
+#                   value: "9060"
+#               image: dougbtv/homer-k8s-cron
+#               command: 
+#                 - "/run.sh"
+#               resources: {}
+#               volumeMounts:
+#                 - mountPath: /homer-semaphore/
+#                   name: homer-data-semaphore
+#               restartPolicy: Always
+#               volumes:
+#                 - name: homer-data-semaphore
+#                   persistentVolumeClaim:
+#                     claimName: homer-data-semaphore
+#               restartPolicy: OnFailure
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
