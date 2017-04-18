@@ -19,6 +19,11 @@ services:
       - ./homer.env
     restart: always
   # --------------------------------------------- cron container
+  hepgen:
+    container_name: hepgen
+    build: ./hepgen/.
+    image: dougbtv/hepgen
+  # --------------------------------------------- cron container
   cron:
     container_name: homer-cron
     build: ./cron-k8s/.
