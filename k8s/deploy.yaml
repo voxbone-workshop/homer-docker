@@ -1,3 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  creationTimestamp: null
+  name: env-config
+data:
+  # A lot of these could be secrets, -Doug
+  TZ: '"Etc/UTC"'
+  DB_USER: homer_user
+  DB_PASS: homer_password
+  USE_REMOTE_MYSQL: "false"
+  DB_HOST: mysql
+  DB_PORT: "3306"
+  MYSQL_ROOT_PASSWORD: secret
+  KAMAILIO_HEP_PORT: "9060"
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -14,23 +30,9 @@ spec:
       - name: bootstrap-mysql
         command:
           - /bootstrap.sh
-        env:
-          - name: TZ
-            value: '"Etc/UTC"'
-          - name: DB_USER
-            value: homer_user
-          - name: DB_PASS
-            value: homer_password
-          - name: USE_REMOTE_MYSQL
-            value: "false"
-          - name: DB_HOST
-            value: mysql
-          - name: DB_PORT
-            value: "3306"
-          - name: MYSQL_ROOT_PASSWORD
-            value: secret
-          - name: KAMAILIO_HEP_PORT
-            value: "9060"
+        envFrom:
+          - configMapRef:
+             name: env-config
         image: dougbtv/homer-bootstrap-data
         resources: {}
         volumeMounts:
@@ -46,56 +48,6 @@ spec:
         persistentVolumeClaim:
           claimName: homer-data-dashboard
 status: {}
----
-# -----------------------------------------------
-# -- Alpha feature!
-# -----------------------------------------------
-# k8s cron docs: http://tinyurl.com/kube-cron
-# Have to enable it in the api etc. So...
-# For now, going old school style.
-# -----------------------------------------------
-# apiVersion: batch/v2alpha1
-# kind: CronJob
-# metadata:
-#   name: homer-cron
-# spec:
-#   schedule: "30 3 * * *"
-#   jobTemplate:
-#     spec:
-#       template:
-#         spec:
-#           containers:
-#             - name: homer-cron
-#               env:
-#                 - name: TZ
-#                   value: '"Etc/UTC"'
-#                 - name: DB_USER
-#                   value: homer_user
-#                 - name: DB_PASS
-#                   value: homer_password
-#                 - name: USE_REMOTE_MYSQL
-#                   value: "false"
-#                 - name: DB_HOST
-#                   value: mysql
-#                 - name: DB_PORT
-#                   value: "3306"
-#                 - name: MYSQL_ROOT_PASSWORD
-#                   value: secret
-#                 - name: KAMAILIO_HEP_PORT
-#                   value: "9060"
-#               image: dougbtv/homer-k8s-cron
-#               command: 
-#                 - "/run.sh"
-#               resources: {}
-#               volumeMounts:
-#                 - mountPath: /homer-semaphore/
-#                   name: homer-data-semaphore
-#               restartPolicy: Always
-#               volumes:
-#                 - name: homer-data-semaphore
-#                   persistentVolumeClaim:
-#                     claimName: homer-data-semaphore
-#               restartPolicy: OnFailure
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -113,25 +65,11 @@ spec:
         service: cron
     spec:
       containers:
-      - env:
-        - name: TZ
-          value: '"Etc/UTC"'
-        - name: DB_USER
-          value: homer_user
-        - name: DB_PASS
-          value: homer_password
-        - name: USE_REMOTE_MYSQL
-          value: "false"
-        - name: DB_HOST
-          value: mysql
-        - name: DB_PORT
-          value: "3306"
-        - name: MYSQL_ROOT_PASSWORD
-          value: secret
-        - name: KAMAILIO_HEP_PORT
-          value: "9060"
+      - name: homer-cron
+        envFrom:
+          - configMapRef:
+              name: env-config
         image: dougbtv/homer-cron
-        name: homer-cron
         resources: {}
         volumeMounts:
         - mountPath: /homer-semaphore/
@@ -159,25 +97,11 @@ spec:
         service: kamailio
     spec:
       containers:
-      - env:
-        - name: TZ
-          value: '"Etc/UTC"'
-        - name: DB_USER
-          value: homer_user
-        - name: DB_PASS
-          value: homer_password
-        - name: USE_REMOTE_MYSQL
-          value: "false"
-        - name: DB_HOST
-          value: mysql
-        - name: DB_PORT
-          value: "3306"
-        - name: MYSQL_ROOT_PASSWORD
-          value: secret
-        - name: KAMAILIO_HEP_PORT
-          value: "9060"
+      - name: homer-kamailio
+        envFrom:
+          - configMapRef:
+              name: env-config
         image: dougbtv/homer-kamailio
-        name: homer-kamailio
         ports:
         - containerPort: 9060
           protocol: UDP
@@ -212,23 +136,9 @@ spec:
           - /entrypoint.sh 
         args:
           - mysqld
-        env:
-        - name: TZ
-          value: '"Etc/UTC"'
-        - name: DB_USER
-          value: homer_user
-        - name: DB_PASS
-          value: homer_password
-        - name: USE_REMOTE_MYSQL
-          value: "false"
-        - name: DB_HOST
-          value: mysql
-        - name: DB_PORT
-          value: "3306"
-        - name: MYSQL_ROOT_PASSWORD
-          value: secret
-        - name: KAMAILIO_HEP_PORT
-          value: "9060"
+        envFrom:
+          - configMapRef:
+              name: env-config
         image: mysql:5.6
         name: mysql
         resources: {}
@@ -263,25 +173,11 @@ spec:
         service: webapp
     spec:
       containers:
-      - env:
-        - name: TZ
-          value: '"Etc/UTC"'
-        - name: DB_USER
-          value: homer_user
-        - name: DB_PASS
-          value: homer_password
-        - name: USE_REMOTE_MYSQL
-          value: "false"
-        - name: DB_HOST
-          value: mysql
-        - name: DB_PORT
-          value: "3306"
-        - name: MYSQL_ROOT_PASSWORD
-          value: secret
-        - name: KAMAILIO_HEP_PORT
-          value: "9060"
+      - name: homer-webapp
+        envFrom:
+          - configMapRef:
+             name: env-config
         image: dougbtv/homer-webapp
-        name: homer-webapp
         ports:
         - containerPort: 80
         resources: {}
@@ -299,4 +195,40 @@ spec:
         persistentVolumeClaim:
           claimName: homer-data-dashboard
 status: {}
+---
+# -----------------------------------------------
+# -- Alpha feature!
+# -----------------------------------------------
+# k8s cron docs: http://tinyurl.com/kube-cron
+# Have to enable it in the api etc. So...
+# For now, going old school style.
+# -----------------------------------------------
+# apiVersion: batch/v2alpha1
+# kind: CronJob
+# metadata:
+#   name: homer-cron
+# spec:
+#   schedule: "30 3 * * *"
+#   jobTemplate:
+#     spec:
+#       template:
+#         spec:
+#           containers:
+#             - name: homer-cron
+#               envFrom:
+#                 - configMapRef:
+#                   name: env-config
+#               image: dougbtv/homer-k8s-cron
+#               command: 
+#                 - "/run.sh"
+#               resources: {}
+#               volumeMounts:
+#                 - mountPath: /homer-semaphore/
+#                   name: homer-data-semaphore
+#               restartPolicy: Always
+#               volumes:
+#                 - name: homer-data-semaphore
+#                   persistentVolumeClaim:
+#                     claimName: homer-data-semaphore
+#               restartPolicy: OnFailure
 ---
