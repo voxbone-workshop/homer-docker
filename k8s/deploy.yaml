@@ -38,15 +38,10 @@ spec:
         volumeMounts:
         - mountPath: /homer-semaphore/
           name: homer-data-semaphore
-        - mountPath: /var/www/html/store/dashboard/
-          name: homer-data-dashboard
       volumes:
       - name: homer-data-semaphore
         persistentVolumeClaim:
           claimName: homer-data-semaphore
-      - name: homer-data-dashboard
-        persistentVolumeClaim:
-          claimName: homer-data-dashboard
 status: {}
 ---
 apiVersion: extensions/v1beta1
@@ -162,6 +157,23 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   name: webapp
+  annotations:
+    # ---------------------------------------------------------------
+    # Thought this could work-around bad perms in dashboard volume.
+    # ---------------------------------------------------------------
+    # pod.alpha.kubernetes.io/init-containers: | 
+    #   [{
+    #       "name": "webapp-init",
+    #       "image": "busybox",
+    #       "imagePullPolicy": "IfNotPresent",
+    #       "command": ["sh", "-c", "chown -R 33:33 /var/www/html/store/dashboard/"],
+    #       "volumeMounts": [
+    #           {
+    #             "name": "homer-data-dashboard",
+    #             "mountPath": "/var/www/html/store/dashboard/"
+    #           }
+    #       ]
+    #   }]
 spec:
   replicas: 1
   strategy:
@@ -184,25 +196,32 @@ spec:
         volumeMounts:
         - mountPath: /homer-semaphore/
           name: homer-data-semaphore
-        - mountPath: /var/www/html/store/dashboard/
-          name: homer-data-dashboard
+        # - mountPath: /var/www/html/store/dashboard/
+        #   name: homer-data-dashboard
       restartPolicy: Always
       volumes:
       - name: homer-data-semaphore
         persistentVolumeClaim:
           claimName: homer-data-semaphore
-      - name: homer-data-dashboard
-        persistentVolumeClaim:
-          claimName: homer-data-dashboard
+      # - name: homer-data-dashboard
+      #   persistentVolumeClaim:
+      #     claimName: homer-data-dashboard
 status: {}
 ---
-# -----------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
 # -- Alpha feature!
-# -----------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
 # k8s cron docs: http://tinyurl.com/kube-cron
 # Have to enable it in the api etc. So...
-# For now, going old school style.
-# -----------------------------------------------
+# [centos@kube-master k8s]$ sudo diff /etc/kubernetes/manifests/kube-apiserver.yaml /root/kube-apiserver.yaml
+# 36d35
+# <     - --runtime-config=batch/v2alpha1=true
+# ------------------------------------------------------------------------------------------------------------
+# The api server will automatically apply this after changing that manifest.
+# ------------------------------------------------------------------------------------------------------------
+# NOTE: Since this also needs to run on first instantiation to "prime" all the tables...
+# You'll also need to enable a one-shot job to also do the same thing.
+# ------------------------------------------------------------------------------------------------------------
 # apiVersion: batch/v2alpha1
 # kind: CronJob
 # metadata:
@@ -217,7 +236,7 @@ status: {}
 #             - name: homer-cron
 #               envFrom:
 #                 - configMapRef:
-#                   name: env-config
+#                     name: env-config
 #               image: dougbtv/homer-k8s-cron
 #               command: 
 #                 - "/run.sh"
@@ -225,10 +244,10 @@ status: {}
 #               volumeMounts:
 #                 - mountPath: /homer-semaphore/
 #                   name: homer-data-semaphore
-#               restartPolicy: Always
-#               volumes:
-#                 - name: homer-data-semaphore
-#                   persistentVolumeClaim:
-#                     claimName: homer-data-semaphore
-#               restartPolicy: OnFailure
+#           restartPolicy: OnFailure
+#           volumes:
+#             - name: homer-data-semaphore
+#               persistentVolumeClaim:
+#                 claimName: homer-data-semaphore
+
 ---

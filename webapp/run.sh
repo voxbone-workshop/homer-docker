@@ -32,6 +32,7 @@ perl -p -i -e "s/\{\{ DB_USER \}\}/$DB_USER/" $PATH_HOMER_CONFIG
 # Set Permissions for webapp
 mkdir /var/www/html/api/tmp
 chmod -R 0777 /var/www/html/api/tmp/
+chown -R www-data:www-data /var/www/html/store/dashboard
 chmod -R 0775 /var/www/html/store/dashboard*
 
 #enable apache mod_php and mod_rewrite
