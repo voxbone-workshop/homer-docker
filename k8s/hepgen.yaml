@@ -1,27 +1,33 @@
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: hepgen
 spec:
-  containers:
-  - name: hepgen
-    image: dougbtv/hepgen
-    command:
-      - "/bin/bash"
-    args:
-      - "-c"
-      - "while true; do sleep 60; done;"
-    volumeMounts:
-      - mountPath: /hepgen.js/config/
-        name: config
-  volumes:
-    - name: config
-      configMap:
-        name: sample-hepgen-config
-        items:
-        - key: hepgen-config
-          path: default.js
+  template:
+    metadata:
+      creationTimestamp: null
+      name: hepgen
+    spec:      
+      restartPolicy: Never
+      containers:
+      - name: hepgen
+        image: dougbtv/hepgen
+        command:
+          - "/bin/bash"
+        args:
+          - "-c"
+          - "node hepgen.js"
+        volumeMounts:
+          - mountPath: /hepgen.js/config/
+            name: config
+      volumes:
+        - name: config
+          configMap:
+            name: sample-hepgen-config
+            items:
+            - key: hepgen-config
+              path: default.js
 ---
 apiVersion: v1
 kind: ConfigMap
