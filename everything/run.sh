@@ -96,7 +96,7 @@ function MYSQL_RUN () {
   chown -R mysql:mysql "$DATADIR"    
 
   echo 'Starting mysqld'
-  mysqld &
+  /etc/init.d/mysql start
   #echo 'Waiting for mysqld to come online'
   while [ ! -x /var/run/mysqld/mysqld.sock ]; do
       sleep 1
@@ -109,7 +109,8 @@ function MYSQL_INITIAL_DATA_LOAD () {
   echo "Beginning initial data load...."
 
   chown -R mysql:mysql "$DATADIR"
-  mysql_install_db --user=mysql --datadir="$DATADIR"
+  mysqld --initialize --user=mysql --datadir="$DATADIR"
+  # mysql_install_db --user=mysql --datadir="$DATADIR"
 
   MYSQL_RUN
 
