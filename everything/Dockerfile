@@ -43,8 +43,8 @@ WORKDIR /
 RUN git clone --depth 1 https://github.com/sipcapture/homer-api.git /homer-api
 RUN git clone --depth 1 https://github.com/sipcapture/homer-ui.git /homer-ui
 
-RUN chmod -R +x /homer-api/scripts/*
-RUN cp -R /homer-api/scripts/. /opt/
+RUN chmod -R +x /homer-api/scripts/mysql/*
+RUN cp -R /homer-api/scripts/mysql/. /opt/
 
 RUN cp -R /homer-ui/* /var/www/html/
 RUN cp -R /homer-api/api /var/www/html/
@@ -75,7 +75,7 @@ RUN touch /var/log/cron.log
 RUN apt-get install cron -y
 
 # Add our crontab file
-RUN echo "30 3 * * * /opt/homer_rotate >> /var/log/cron.log 2>&1" > /crons.conf
+RUN echo "30 3 * * * /opt/homer_mysql_rotate >> /var/log/cron.log 2>&1" > /crons.conf
 RUN crontab /crons.conf
 
 COPY run.sh /run.sh
