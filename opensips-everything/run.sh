@@ -165,7 +165,7 @@ if [ "$DB_HOST" == "$DOCK_IP" ]; then
 fi
 
 # OpenSIPS config
-export PATH_OPENSIPS_CFG=/usr/local/opensips/etc/opensips/opensips.cfg
+export PATH_OPENSIPS_CFG=/etc/opensips/opensips.cfg
 
 # Replace values in template
 # perl -p -i -e "s/9060/$OPENSIPS_HEP_PORT/" $PATH_OPENSIPS_CFG
