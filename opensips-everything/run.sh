@@ -130,7 +130,7 @@ function MYSQL_INITIAL_DATA_LOAD () {
   echo "Beginning initial data load...."
 
   chown -R mysql:mysql "$DATADIR"
-  mysql_install_db --user=mysql --datadir="$DATADIR"
+  mysqld --initialize-insecure=on --user=mysql --datadir="$DATADIR"
 
   MYSQL_RUN
 
