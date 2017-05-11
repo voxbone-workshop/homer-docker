@@ -1,6 +1,6 @@
 FROM debian:jessie
 MAINTAINER L. Mangani <lorenzo.mangani@gmail.com>
-# v.5.02
+# v.5.x
 
 # Default baseimage settings
 ENV HOME /root
@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Update and upgrade apt
 RUN apt-get update -qq
 # RUN apt-get upgrade -y
-RUN apt-get install --no-install-recommends --no-install-suggests -yqq ca-certificates apache2 libapache2-mod-php5 php5 php5-ldap php5-cli php5-gd php-pear php5-dev php5-mysql php5-json php-services-json git wget pwgen && rm -rf /var/lib/apt/lists/*
+RUN apt-get install --no-install-recommends --no-install-suggests -yqq ca-certificates apache2 libapache2-mod-php5 php5 php5-cli php5-gd php-pear php5-dev php5-mysql php5-json php-services-json git wget pwgen curl && rm -rf /var/lib/apt/lists/*
 RUN a2enmod php5
 
 # MySQL
@@ -21,7 +21,8 @@ RUN apt-get update && apt-get install -y perl libdbi-perl libclass-dbi-mysql-per
 
 # gpg: key 5072E1F5: public key "MySQL Release Engineering <mysql-build@oss.oracle.com>" imported
 RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys A4A9406876FCBD3C456770C88C718D3B5072E1F5
-ENV MYSQL_MAJOR 5.7
+ENV MYSQL_MAJOR 5.6
+ENV MYSQL_VERSION 5.6.27
 RUN echo "deb http://repo.mysql.com/apt/debian/ jessie mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
 
 RUN apt-get update && apt-get install -y mysql-server libmysqlclient18 && rm -rf /var/lib/apt/lists/* \
@@ -54,14 +55,16 @@ COPY data/configuration.php /var/www/html/api/configuration.php
 COPY data/preferences.php /var/www/html/api/preferences.php
 COPY data/vhost.conf /etc/apache2/sites-enabled/000-default.conf
 
-# OpenSIPS Update and upgrade apt 
-RUN apt-get update -qq && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 049AD65B \
-&& echo "deb http://apt.opensips.org jessie 2.3-releases" >>/etc/apt/sources.list
-RUN apt-get update -qq && apt-get install -f -yqq rsyslog opensips opensips-geoip-module opensips-json-module opensips-mysql-module opensips-regex-module opensips-restclient-module geoip-database geoip-database-extra && rm -rf /var/lib/apt/lists/*
+# OpenSIPS + sipcapture module
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 049AD65B
+RUN echo "deb http://apt.opensips.org jessie 2.3-releases" >>/etc/apt/sources.list
+RUN apt-get update -qq && apt-get install -f -yqq rsyslog opensips opensips-geoip-module opensips-json-module opensips-mysql-module opensips-regex-module opensips-restclient-module  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /etc/opensips
-COPY data/opensips.cfg /etc/opensips/opensips.cfg
-RUN chmod 775 /etc/opensips/opensips.cfg
+RUN rm /etc/opensips/opensips.cfg
+COPY data/opensips.m4 /etc/opensips/opensips.m4
+RUN chmod 775 /etc/opensips/opensips.m4
+COPY data/opensips-es.m4 /etc/opensips/opensips-es.m4
+RUN chmod 775 /etc/opensips/opensips-es.m4
 
 RUN ln -s /usr/lib64 /usr/lib/x86_64-linux-gnu/
 
@@ -74,13 +77,13 @@ RUN touch /var/log/cron.log
 RUN apt-get install cron -y
 
 # Add our crontab file
-RUN echo "30 3 * * * /opt/homer_mysql_rotate >> /var/log/cron.log 2>&1" > /crons.conf
-RUN crontab /crons.conf
+RUN echo "30 3 * * * /opt/homer_mysql_rotate >> /var/log/cron.log 2>&1" > /etc/cron.d/homer_mysql_rotate.conf
+RUN echo "local0.* -/var/log/opensips.log" > /etc/rsyslog.d/opensips.conf
 
 COPY run.sh /run.sh
 RUN chmod a+rx /run.sh
 
-RUN wget -O /dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.1.3/dumb-init_1.1.3_amd64 && chmod +x /dumb-init
+COPY data/homer-es-template.json /etc/homer-es-template.json
 
 # Add persistent MySQL volumes
 VOLUME ["/etc/mysql", "/var/lib/mysql", "/var/www/html/store"]
@@ -89,8 +92,5 @@ VOLUME ["/etc/mysql", "/var/lib/mysql", "/var/www/html/store"]
 EXPOSE 80
 # HEP
 EXPOSE 9060
-# MySQL
-#EXPOSE 3306
 
-ENTRYPOINT ["/dumb-init", "--"]
-CMD ["/run.sh"]
+ENTRYPOINT ["/run.sh"]
