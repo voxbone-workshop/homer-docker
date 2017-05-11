@@ -96,7 +96,7 @@ function MYSQL_RUN () {
   chown -R mysql:mysql "$DATADIR"    
 
   echo 'Starting mysqld'
-  mysqld &
+  /etc/init.d/mysql start
   #echo 'Waiting for mysqld to come online'
   while [ ! -x /var/run/mysqld/mysqld.sock ]; do
       sleep 1
@@ -109,7 +109,7 @@ function MYSQL_INITIAL_DATA_LOAD () {
   echo "Beginning initial data load...."
 
   chown -R mysql:mysql "$DATADIR"
-  mysql_install_db --user=mysql --datadir="$DATADIR"
+  mysqld --initialize-insecure=on --user=mysql --datadir="$DATADIR"
 
   MYSQL_RUN
 
@@ -151,13 +151,13 @@ if [ "$DB_HOST" == "$DOCK_IP" ]; then
     fi
 
     # Reconfigure rotation
-    export PATH_ROTATION_SCRIPT=/opt/homer_rotate
+    export PATH_ROTATION_SCRIPT=/opt/homer_mysql_rotate
     chmod 775 $PATH_ROTATION_SCRIPT
     chmod +x $PATH_ROTATION_SCRIPT
     perl -p -i -e "s/homer_user/$DB_USER/" $PATH_ROTATION_SCRIPT
     perl -p -i -e "s/homer_password/$DB_PASS/" $PATH_ROTATION_SCRIPT
     # Init rotation
-    /opt/homer_rotate > /dev/null 2>&1
+    /opt/homer_mysql_rotate > /dev/null 2>&1
     
     # Start the cron service in the background for rotation
     cron -f &
