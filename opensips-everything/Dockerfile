@@ -3,7 +3,7 @@ MAINTAINER L. Mangani <lorenzo.mangani@gmail.com>
 # v.5.02
 
 # Default baseimage settings
-kENV HOME /root
+ENV HOME /root
 ENV DEBIAN_FRONTEND noninteractive
 
 # Update and upgrade apt
