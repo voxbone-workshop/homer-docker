@@ -57,7 +57,7 @@ COPY data/vhost.conf /etc/apache2/sites-enabled/000-default.conf
 
 # OpenSIPS + sipcapture module
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 049AD65B
-RUN echo "deb http://apt.opensips.org jessie 2.3-releases" >>/etc/apt/sources.list
+RUN echo "deb http://apt.opensips.org jessie 2.2-releases" >>/etc/apt/sources.list
 RUN apt-get update -qq && apt-get install -f -yqq rsyslog opensips opensips-geoip-module opensips-json-module opensips-mysql-module opensips-regex-module opensips-restclient-module  && rm -rf /var/lib/apt/lists/*
 
 RUN rm /etc/opensips/opensips.cfg
