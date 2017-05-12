@@ -227,6 +227,9 @@ fi
 # Make an alias, kinda.
 opensips=$(which opensips)
 
+service rsyslog start
+touch /var/log/opensips.log
+
 # Test the syntax.
 $opensips -f $PATH_OPENSIPS_CFG -c
 
@@ -239,10 +242,8 @@ a2enmod rewrite
 rm -f /var/run/apache2/apache2.pid 2> /dev/null
 apachectl start
 
-service rsyslog start
-touch /var/log/opensips.log
 
 # It's Homer time!
-/usr/sbin/opensipsctl start
+/usr/sbin/opensipsctl start && /usr/sbin/opensipsctl start
 
 tail -f /var/log/opensips.log
