@@ -118,10 +118,10 @@ function MYSQL_RUN () {
 
   echo 'Starting mysqld'
   service mysql start
-  #echo 'Waiting for mysqld to come online'
-  #while [ ! -x /var/run/mysqld/mysqld.sock ]; do
-  #    sleep 1
-  #done
+  echo 'Waiting for mysqld to come online'
+  while [ ! -x /var/run/mysqld/mysqld.sock ]; do
+      sleep 1
+  done
 
 }
 
