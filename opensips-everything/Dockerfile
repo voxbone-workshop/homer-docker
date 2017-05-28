@@ -51,9 +51,9 @@ RUN cp -R /homer-api/api /var/www/html/
 RUN chown -R www-data:www-data /var/www/html/store/
 RUN chmod -R 0775 /var/www/html/store/dashboard
 
-COPY data/configuration.php /var/www/html/api/configuration.php
-COPY data/preferences.php /var/www/html/api/preferences.php
-COPY data/vhost.conf /etc/apache2/sites-enabled/000-default.conf
+RUN wget https://raw.githubusercontent.com/sipcapture/homer-config/master/docker/configuration.php -O /var/www/html/api/configuration.php
+RUN wget https://raw.githubusercontent.com/sipcapture/homer-config/master/docker/preferences.php -O /var/www/html/api/preferences.php
+RUN wget https://raw.githubusercontent.com/sipcapture/homer-config/master/docker/vhost.conf -O /etc/apache2/sites-enabled/000-default.conf
 
 # OpenSIPS + sipcapture module
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 049AD65B
