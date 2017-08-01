@@ -17,6 +17,10 @@ sqlpassword=secret
 DOCK_IP="127.0.0.1"
 ES_STATUS=disabled
 
+# MYSQL SETUP
+SQL_LOCATION=/homer-api/sql/mysql
+DATADIR=/var/lib/mysql
+
 show_help() {
 cat << EOF
 Usage: ${0##*/} [--hep 9060]
@@ -106,11 +110,6 @@ PATH_MYSQL_CONFIG=/etc/mysql/my.cnf
 perl -p -i -e "s/sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES/sql_mode=NO_ENGINE_SUBSTITUTION/" $PATH_MYSQL_CONFIG
 sed '/\[mysqld\]/a max_connections = 1024\' -i $PATH_MYSQL_CONFIG
 
-
-# MYSQL SETUP
-SQL_LOCATION=/homer-api/sql
-DATADIR=/var/lib/mysql
-
 # Handy-dandy MySQL run function
 function MYSQL_RUN () {
 
@@ -127,6 +126,7 @@ function MYSQL_RUN () {
 
 # MySQL data loading function
 function MYSQL_INITIAL_DATA_LOAD () {
+
   echo "Beginning initial data load...."
 
   chown -R mysql:mysql "$DATADIR"
@@ -134,21 +134,24 @@ function MYSQL_INITIAL_DATA_LOAD () {
 
   MYSQL_RUN
 
-  echo "Creating Databases..."
-  mysql --host "$DB_HOST" -u "$sqluser" < $SQL_LOCATION/homer_databases.sql
-  mysql --host "$DB_HOST" -u "$sqluser" < $SQL_LOCATION/homer_user.sql
+  echo 'Setting root password....'
+  mysql -u root -e "SET PASSWORD = PASSWORD('$sqlpassword');FLUSH PRIVILEGES;"
 
-  mysql --host "$DB_HOST" -u "$sqluser" -e "GRANT ALL ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS'; FLUSH PRIVILEGES;";
+  echo "Creating DB User..."
+  mysql  -u "$sqluser" -p"$sqlpassword" -e "CREATE USER '$DB_USER'@'$DB_HOST' IDENTIFIED BY '$DB_PASS';";
+  mysql  -u "$sqluser" -p"$sqlpassword" -e "GRANT ALL ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS'; FLUSH PRIVILEGES;";
+
+  echo "Creating Databases..."
+  mysql  -u "$sqluser" -p"$sqlpassword" < $SQL_LOCATION/homer_databases.sql
+  mysql  -u "$sqluser" -p"$sqlpassword" < $SQL_LOCATION/homer_user.sql
+
   echo "Creating Tables..."
-  mysql --host "$DB_HOST" -u "$sqluser" homer_data < $SQL_LOCATION/schema_data.sql
-  mysql --host "$DB_HOST" -u "$sqluser" homer_configuration < $SQL_LOCATION/schema_configuration.sql
-  mysql --host "$DB_HOST" -u "$sqluser" homer_statistic < $SQL_LOCATION/schema_statistic.sql
+  mysql  -u "$sqluser" -p"$sqlpassword" homer_data < $SQL_LOCATION/schema_data.sql
+  mysql  -u "$sqluser" -p"$sqlpassword" homer_configuration < $SQL_LOCATION/schema_configuration.sql
+  mysql  -u "$sqluser" -p"$sqlpassword" homer_statistic < $SQL_LOCATION/schema_statistic.sql
 
   # echo "Creating local DB Node..."
-  mysql --host "$DB_HOST" -u "$sqluser" homer_configuration -e "INSERT INTO node VALUES(1,'mysql','homer_data','3306','"$DB_USER"','"$DB_PASS"','sip_capture','node1', 1);"
-
-  echo 'Setting root password....'
-  mysql -u root -e "SET PASSWORD = PASSWORD('$sqlpassword');"
+  mysql  -u "$sqluser" -p"$sqlpassword" homer_configuration -e "INSERT INTO node VALUES(1,'mysql','homer_data','3306','"$DB_USER"','"$DB_PASS"','sip_capture','node1', 1);"
 
   echo "Homer initial data load complete" > $DATADIR/.homer_initialized
 
