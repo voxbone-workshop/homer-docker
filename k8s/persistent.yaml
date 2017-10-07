@@ -6,7 +6,7 @@ metadata:
   # This storage class is a work around for now...
   # see: https://github.com/kubernetes/kubernetes/issues/43929
 spec:
-  storageClassName: storage
+  storageClassName: gluster
   accessModes:
     - ReadWriteOnce
   resources:
@@ -20,7 +20,7 @@ metadata:
   creationTimestamp: null
   name: homer-data-mysql
 spec:
-  storageClassName: storage
+  storageClassName: gluster
   accessModes:
     - ReadWriteOnce
   resources:
@@ -34,7 +34,7 @@ metadata:
   creationTimestamp: null
   name: homer-data-semaphore
 spec:
-  storageClassName: storage
+  storageClassName: gluster
   accessModes:
     - ReadWriteOnce
   resources:
